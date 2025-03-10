@@ -1,5 +1,7 @@
 package com.melnikov.auth_service.service;
 
+import com.melnikov.auth_service.dto.EmailResponse;
+import com.melnikov.auth_service.dto.TokenResponse;
 import com.melnikov.auth_service.jwt.JwtTokenProvider;
 import com.melnikov.auth_service.kafka.KafkaProducer;
 import com.melnikov.auth_service.model.User;
@@ -31,7 +33,7 @@ public class AuthService {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
-    public String registerUser(String email) {
+    public EmailResponse registerUser(String email) {
         if (userRepository.existsByEmail(email)) {
             throw new RuntimeException("User already exists");
         }
@@ -48,14 +50,12 @@ public class AuthService {
         verificationCode.setExpiresAt(LocalDateTime.now().plusMinutes(5));
         verificationCodeRepository.save(verificationCode);
 
-        log.info("Sending verification code: {} to email:{}", code, email);
-
         kafkaProducer.sendEmail(email, code);
 
-        return "Verification code sent to " + email;
+        return new EmailResponse("Verification code send to email", email);
     }
 
-    public String verifyCode(String email, String code) {
+    public TokenResponse verifyCode(String email, String code) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -69,7 +69,7 @@ public class AuthService {
         user.setVerified(true);
         userRepository.save(user);
 
-        return jwtTokenProvider.generateToken(email);
+        return new TokenResponse(jwtTokenProvider.generateToken(email));
     }
 
     private String generateCode() {

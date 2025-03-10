@@ -1,7 +1,10 @@
 package com.melnikov.auth_service.controller;
 
+import com.melnikov.auth_service.dto.EmailResponse;
+import com.melnikov.auth_service.dto.TokenResponse;
 import com.melnikov.auth_service.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,12 +22,14 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public String register(@RequestParam String email) {
-        return authService.registerUser(email);
+    public ResponseEntity<EmailResponse> register(@RequestParam String email) {
+        EmailResponse emailResponse = authService.registerUser(email);
+        return ResponseEntity.ok(emailResponse);
     }
 
     @PostMapping("/verify")
-    public String verify(@RequestParam String email, @RequestParam String code) {
-        return authService.verifyCode(email, code);
+    public ResponseEntity<TokenResponse> verify(@RequestParam String email, @RequestParam String code) {
+        TokenResponse tokenResponse = authService.verifyCode(email, code);
+        return ResponseEntity.ok(tokenResponse);
     }
 }

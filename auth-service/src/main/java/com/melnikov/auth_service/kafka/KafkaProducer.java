@@ -16,7 +16,7 @@ public class KafkaProducer {
     }
 
     public void sendEmail(String email, String code) {
-        log.info("Sending email: {} and code: {} through Kafka", email, code);
+        log.info("Sending code for email: {} through Kafka", email);
         kafkaTemplate.send("email-topic", email, code);
     }
 }
