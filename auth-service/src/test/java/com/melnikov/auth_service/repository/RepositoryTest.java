@@ -27,9 +27,9 @@ public class RepositoryTest {
             .withUsername("postgres")
             .withPassword("postgres");
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    private VerificationCodeRepository verificationCodeRepository;
+    private final VerificationCodeRepository verificationCodeRepository;
 
     @Autowired
     public RepositoryTest(UserRepository userRepository, VerificationCodeRepository verificationCodeRepository) {

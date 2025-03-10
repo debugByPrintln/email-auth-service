@@ -5,6 +5,12 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
+/**
+ * Сущность, представляющая код подтверждения для пользователя.
+ * Содержит код, срок действия и связь с пользователем.
+ *
+ * @author Мельников Никита
+ */
 @Data
 @Entity
 public class VerificationCode {

@@ -16,7 +16,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
+/**
+ * Провайдер для работы с JWT-токенами.
+ * Генерирует, валидирует и извлекает данные из JWT-токенов.
+ *
+ * @author Мельников Никита
+ */
 @Component
 @Log4j2
 public class JwtTokenProvider {
@@ -27,6 +32,12 @@ public class JwtTokenProvider {
     @Value("${jwt.expiration}")
     private long expiration;
 
+    /**
+     * Генерирует JWT-токен для указанного email.
+     *
+     * @param email адрес электронной почты пользователя
+     * @return сгенерированный JWT-токен
+     */
     public String generateToken(String email) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expiration);
@@ -40,6 +51,12 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    /**
+     * Извлекает email из JWT-токена.
+     *
+     * @param token JWT-токен
+     * @return email пользователя
+     */
     public String getEmailFromToken(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(getKey())
@@ -50,6 +67,12 @@ public class JwtTokenProvider {
         return claims.getSubject();
     }
 
+    /**
+     * Извлекает права доступа (роли) из JWT-токена.
+     *
+     * @param token JWT-токен
+     * @return список прав доступа пользователя
+     */
     public List<GrantedAuthority> getAuthoritiesFromToken(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(getKey())
@@ -69,9 +92,15 @@ public class JwtTokenProvider {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Проверяет валидность JWT-токена.
+     *
+     * @param token JWT-токен
+     * @return true, если токен валиден, иначе false
+     */
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder() // Новый метод parserBuilder
+            Jwts.parserBuilder()
                     .setSigningKey(getKey())
                     .build()
                     .parseClaimsJws(token);
@@ -82,6 +111,11 @@ public class JwtTokenProvider {
         }
     }
 
+    /**
+     * Возвращает секретный ключ для подписи JWT-токенов.
+     *
+     * @return секретный ключ
+     */
     private SecretKey getKey() {
         return Keys.hmacShaKeyFor(secret.getBytes());
     }

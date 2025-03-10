@@ -10,16 +10,35 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+/**
+ * Конфигурация безопасности приложения.
+ * Настройка правил доступа, фильтров и политик аутентификации.
+ *
+ * @author Мельников Никита
+ */
 @Configuration
 public class SecurityConfig {
 
     private final JwtTokenFilter filter;
 
+    /**
+     * Конструктор для внедрения зависимости JwtTokenFilter.
+     *
+     * @param filter фильтр для обработки JWT-токенов
+     */
     @Autowired
     public SecurityConfig(JwtTokenFilter filter) {
         this.filter = filter;
     }
 
+    /**
+     * Настройка цепочки фильтров безопасности.
+     * Отключает CSRF, настраивает stateless-сессии и правила доступа.
+     *
+     * @param http конфигуратор безопасности HTTP-запросов
+     * @return настроенная цепочка фильтров безопасности
+     * @throws Exception если возникает ошибка при настройке
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
