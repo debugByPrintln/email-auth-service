@@ -2,6 +2,10 @@ package com.melnikov.auth_service.service;
 
 import com.melnikov.auth_service.dto.EmailResponse;
 import com.melnikov.auth_service.dto.TokenResponse;
+import com.melnikov.auth_service.exception.CodeExpiredException;
+import com.melnikov.auth_service.exception.InvalidCodeException;
+import com.melnikov.auth_service.exception.UserAlreadyExistsException;
+import com.melnikov.auth_service.exception.UserNotFoundException;
 import com.melnikov.auth_service.jwt.JwtTokenProvider;
 import com.melnikov.auth_service.kafka.KafkaProducer;
 import com.melnikov.auth_service.model.User;
@@ -35,7 +39,7 @@ public class AuthService {
 
     public EmailResponse registerUser(String email) {
         if (userRepository.existsByEmail(email)) {
-            throw new RuntimeException("User already exists");
+            throw new UserAlreadyExistsException("User with email: " + email + " already exists");
         }
 
         User user = new User();
@@ -57,13 +61,13 @@ public class AuthService {
 
     public TokenResponse verifyCode(String email, String code) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User with email: " + email + " already exists"));
 
         VerificationCode verificationCode = verificationCodeRepository.findByUserAndCode(user, code)
-                .orElseThrow(() -> new RuntimeException("Invalid code"));
+                .orElseThrow(() -> new InvalidCodeException("Code: " + code + " is invalid"));
 
         if (LocalDateTime.now().isAfter(verificationCode.getExpiresAt())) {
-            throw new RuntimeException("Code expired");
+            throw new CodeExpiredException("Code: " + code + " is expired");
         }
 
         user.setVerified(true);
